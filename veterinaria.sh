@@ -31,27 +31,32 @@ if grep -q "$cedula_dueno" socios.txt; then
 fi
 done
 
-# Solicitar datos de las mascotas (hasta cuatro)
 mascotas=""
-for ((i = 1; i <= 4; i++)); do
-  echo "Ingrese el nombre de la mascota $i (o deje en blanco para finalizar):"
-  read nombre_mascota
-  if [ $nombre_mascota = " " ]; then
-    break
-  fi
+while :
+do
+echo "Ingrese la cantidad de Mascotas (hasta cuatro)."
+read cant
+if((cant>4))
+then
+  echo "No puede ingresar mas de 4 mascotas"
+else 
+break;
+fi
 
+done
+for ((i = 1; i <= cant; i++)) do
+  echo "Ingrese el nombre de la mascota $i :"
+  read nombre_mascota
   echo "Ingrese la edad de la mascota $i:"
   read edad_mascota
 
-  # Agregar los datos de la mascota al string
+
   mascotas+="$nombre_mascota,$edad_mascota,"
 done
 
-# Solicitar opción de contacto
 echo "Ingrese una opción de contacto (mail o número de teléfono):"
 read contacto
 
-# Agregar los datos al archivo "socios.txt"
 echo "$nombre_dueno,$cedula_dueno,$mascotas$contacto" >> socios.txt
 ;;
 2) echo "Manejo Citas"
