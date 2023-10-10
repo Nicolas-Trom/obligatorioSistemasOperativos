@@ -54,7 +54,7 @@ read contacto
 # Agregar los datos al archivo "socios.txt"
 echo "$nombre_dueno,$cedula_dueno,$mascotas$contacto" >> socios.txt
 ;;
-2) echo "Manejo Citas"
+2) echo "Manejo Cit"
 ;;
 3) echo "Actualizar Sotck en Tienda"
   echo "Ingrese Categoria"
