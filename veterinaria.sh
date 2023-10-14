@@ -74,7 +74,7 @@ echo "$nombre_dueno,$cedula_dueno,$mascotas$contacto" >> socios.txt
   read cantidad
   if grep -q "$codigoArticulo" articulos.txt; then
     echo "El artículo ya está agregado"
-    sed -i "s/"$categoria"/$categoria,$codigoArticulo,$nombre,$precio,$cantidad/" articulos.txt
+    sed -i "/$codigoArticulo/ s/\(.*,\)[0-9]*/\1$cantidad/" "articulos.txt"
   else
     echo "$categoria,$codigoArticulo,$nombre,$precio,$cantidad" >> articulos.txt
   fi
