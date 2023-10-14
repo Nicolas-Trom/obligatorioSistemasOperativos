@@ -15,7 +15,7 @@ read opcion
 case $opcion in
 1) echo "Registro de Socios"
 
-# Solicitar datos del dueño
+
 echo "Ingrese el nombre del dueño:"
 read nombre_dueno
 while : 
@@ -23,8 +23,7 @@ do
 echo "Ingrese la cedula del dueño:"
 read cedula_dueno
 
-# Verificar si la cédula ya existe en el archivo
-if grep -q "$cedula_dueno" socios.txt; then
+if (grep -q "$cedula_dueno" socios.txt); then
   echo "La cédula $cedula_dueno ya existe en el sistema."
   else
 	break;
@@ -61,7 +60,8 @@ echo "$nombre_dueno,$cedula_dueno,$mascotas$contacto" >> socios.txt
 ;;
 2) echo "Manejo Citas"
 ;;
-3) echo "Actualizar Sotck en Tienda"
+3) 
+  echo "Actualizar Sotck en Tienda"
   echo "Ingrese Categoria"
   read categoria
   echo "Ingrese Codigo de Articulo"
@@ -72,7 +72,12 @@ echo "$nombre_dueno,$cedula_dueno,$mascotas$contacto" >> socios.txt
   read precio
   echo "Ingrse Cantidad"
   read cantidad
-
+  if grep -q "$codigoArticulo" articulos.txt; then
+    echo "El artículo ya está agregado"
+    sed -i "s/"$categoria"/$categoria,$codigoArticulo,$nombre,$precio,$cantidad/" articulos.txt
+  else
+    echo "$categoria,$codigoArticulo,$nombre,$precio,$cantidad" >> articulos.txt
+  fi
 ;;
 4) echo "Venta de Productos"
 ;;
@@ -83,4 +88,3 @@ echo "$nombre_dueno,$cedula_dueno,$mascotas$contacto" >> socios.txt
 *)echo "Opcion invalida..."
 esac
 done
-
