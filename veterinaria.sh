@@ -59,6 +59,42 @@ read contacto
 echo "$nombre_dueno,$cedula_dueno,$mascotas$contacto" >> socios.txt
 ;;
 2) echo "Manejo Citas"
+while :
+do
+echo "1. Agendar Cita"
+echo "2. Consultar Citas"
+echo "3. Eliminar Cita"
+echo "4. Salir"
+read opcion2
+case $opcion2 in
+1) echo "Agendar Cita"
+echo "Ingrese el nombre"
+read nombre
+echo "Ingresar el Nombre de la Mascota"
+read nombreMascota
+echo "Ingrese el motivo de la Cita"
+read motivo
+echo "Ingresar el costo"
+read costo
+echo "Ingresar la fecha"
+read fecha
+echo "Ingrese la hora"
+read hora
+
+echo "$nombre,$nombreMascota,$motivo,$costo,$fecha,$hora" >> citas.txt
+;;
+2) echo "Consultar Citas"
+  if [ -e "citas.txt" ]; then
+    echo "No hay citas agendadas"
+  else
+    cat citas.txt
+  fi
+
+;;
+4) break ;;
+        *) echo "Opción no válida. Presione Enter para continuar." && read
+    esac
+done
 ;;
 3) 
   echo "Actualizar Sotck en Tienda"
