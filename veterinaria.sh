@@ -69,8 +69,8 @@ read opcion2
 case $opcion2 in
 1) echo "Agendar Cita"
 
-echo "Ingrese el nombre"
-read nombre
+echo "Ingrese el cedula"
+read cedula
 echo "Ingresar el Nombre de la Mascota"
 read nombreMascota
 echo "Ingrese el motivo de la Cita"
@@ -86,15 +86,21 @@ done
 echo "Ingrese la hora"
 read hora
 
-echo "$nombre,$nombreMascota,$motivo,$costo,$fecha,$hora" >> citas.txt
+echo "$cedula,$nombreMascota,$motivo,$costo,$fecha,$hora" >> citas.txt
 ;;
 2) echo "Consultar Citas"
-  if [ -e "citas.txt" ]; then
+  if [ ! -e "citas.txt" ]; then
     echo "No hay citas agendadas"
   else
     cat citas.txt
   fi
 
+;;
+3)echo "Eliminar Consultas"
+   read -p "Ingrese la cédula del cliente: " cedula
+   grep -v "$cedula" citas.txt > citas_temp.txt
+   mv citas_temp.txt citas.txt
+   echo "Las citas para la cédula $cedula han sido eliminadas."
 ;;
 4) break ;;
         *) echo "Opción no válida. Presione Enter para continuar." && read
@@ -121,43 +127,55 @@ done
   fi
 ;;
 4) echo "Venta de Productos"
-   echo "Seleccione la categoría del producto: 1) Medicamentos 2) Suplementos 3) Accesorios"
-   read categoria
-   echo "Ingrese el código del producto:"
-   read codigoArticulo
-   echo "Ingrese la cantidad que desea comprar:"
-   read cantidad
+echo "Seleccione la categoría del producto: 1) Medicamentos 2) Suplementos 3) Accesorios"
+read categoria
+echo "Ingrese el código del producto:"
+read codigoArticulo
+echo "Ingrese la cantidad que desea comprar:"
+read cantidad
+echo "Ingrese la fecha de la venta (formato MM):"
+read fecha
 
-   if grep -q "$codigoArticulo" articulos.txt; then
-       stock=$(grep "$codigoArticulo" articulos.txt | cut -d',' -f5)
-       if (( stock >= cantidad )); then
-           echo "Compra confirmada"
-           nuevoStock=$((stock - cantidad))
-           sed -i "/$codigoArticulo/ s/\(.*,\)[0-9]*/\1$nuevoStock/" "articulos.txt"
-       else
-           echo "No hay suficientes unidades en stock. Intente con una cantidad menor."
-       fi
-   else
-       echo "El producto no existe"
-   fi
+if grep -q "$codigoArticulo" articulos.txt; then
+    stock=$(grep "$codigoArticulo" articulos.txt | cut -d',' -f5)
+    if (( stock >= cantidad )); then
+        echo "Compra confirmada"
+        nuevoStock=$((stock - cantidad))
+        sed -i "/$codigoArticulo/ s/\(.*,\)[0-9]*/\1$nuevoStock/" "articulos.txt"
+        echo "$codigoArticulo,$fecha,$cantidad" >> ventas.txt
+    else
+        echo "No hay suficientes unidades en stock. Intente con una cantidad menor."
+    fi
+else
+    echo "El producto no existe"
+fi
 ;;
 5) echo "Informe Mensual"
-   echo "Ingrese el mes (número entre 1 y 12):"
+   echo "Ingrese el mes (número entre 01 y 12):"
    read mes
 
    while (( mes < 1 || mes > 12 )); do
        echo "Mes inválido. Por favor, ingrese un número entre 1 y 12:"
        read mes
    done
+totalRecaudado=0
+totalVentas=0
 
-   totalVentas=$(grep -c "$mes" ventas.txt)
-   if (( totalVentas > 0 )); then
-       totalRecaudado=$(awk -F',' -v mes="$mes" '$2 == mes {sum += $3} END {print sum}' ventas.txt)
-       promedio=$(echo "scale=2; $totalRecaudado / $totalVentas" | bc)
-       echo "El promedio de lo recaudado en el mes $mes es: $promedio"
-   else
-       echo "No se realizaron ventas en el mes $mes"
-   fi
+# Para cada línea en ventas.txt que corresponda al mes especificado
+while IFS=',' read -r codigo fecha cantidad; do
+    if [[ $fecha -eq $mes ]]; then
+        precio=$(grep "$codigo" articulos.txt | cut -d',' -f4)
+       
+        totalRecaudado=$(echo "$totalRecaudado + $cantidad * $precio" | bc)
+     
+        ((totalVentas = $cantidad + $totalVentas));
+    fi
+done < ventas.txt
+
+promedioVentas=$(echo "scale=2; $totalRecaudado / $totalVentas" | bc)
+
+echo "El total recaudado para el mes $mes es $totalRecaudado"
+echo "El promedio de ventas para el mes $mes es $promedioVentas"
 ;;
 6)exit 0;;
 #Alerta
